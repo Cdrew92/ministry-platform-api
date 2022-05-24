@@ -149,12 +149,20 @@ $events = $mp->table('Events')
 print_r($events);
 ```
 
+### userID Parameter ###
+While using the Client Credentials grant flow, unless a user is explicitly specified using the userID parameter in each POST, PUT, or DELETE call, 
+records created through the REST API are created using the user associated with the API client record your application is using. Note that 
+security roles applied to that user are used in authorizing requests regardless of what user is specified with the userID parameter.
+
+NOTE: The userID parameter is not required for any POST, PUT, or DELETE requests.
+
+
 ### POSTing new Records
 Data can be written to database via HTTP POST request. The new data is specified in the record and all required fields must be provided.
 The record is an array of arrays (2D array) so multiple rows can be created in one API call. Note that even if you are creating only one 
 row of data, the record data must still be a 2D array.
 
-This example will add two participants to an event, each with the status of 02 Registered:
+This example will add two participants to an event on behalf of ```User_ID: 9534```, each with the status of 02 Registered,:
 ```php
 // Create the array of records to POST
 $rec = [];
@@ -163,6 +171,7 @@ $rec[] = ['Event_ID' => 12910, 'Participant_ID' => 46617, 'Participation_Status_
 
 $event = $mp->table('Event_Participants')
 		->select("Event_Participant_ID, Event_ID, Participant_ID, Participation_Status_ID")
+        ->userID(9534)
 		->records($rec)			
 		->post();
 ``` 
@@ -170,7 +179,8 @@ $event = $mp->table('Event_Participants')
 ### Updating Records via PUT
 Existing data can be updated via the HTTP PUT request.  The data to be updated requires the ID for the row (Event_ID, for example) and the fields to be updated. 
 The new data is specified in the record.  The record is an array of arrays (2D array) so multiple updates can be executed in one statement. Note 
-that even if you are updating only one row of data, the record data must still be a 2D array.  This PUT will update the participation status to 03 Attended
+that even if you are updating only one row of data, the record data must still be a 2D array.  This PUT will update the participation status to 03 Attended 
+on behalf of ```User_ID: 9534```.
 
 ```php
 $rec = [];
@@ -178,6 +188,7 @@ $rec[] = ['Event_Participant_ID' => 278456, 'Participation_Status_ID' => 3];
 
 $event = $mp->table('Event_Participants')
 		->select("Event_Participant_ID, Event_ID, Participant_ID, Participation_Status_ID")
+        ->userID(9534)
 		->records($rec)			
 		->put();
 ```
@@ -190,10 +201,10 @@ returning the results of a GET all in one operation.
 Warning: Deleting can do really bad things to your database.  Test in the sandbox! Use at your own risk.  Once it's gone, it's gone.
 
 Existing table rows can be deleted by calling the delete method and passing the id of the row to delete.  For example, to delete the contact with 
-contact_id of 24599, execute this command:
+contact_id of 24599 on behalf of ```User_ID: 9534```, execute this command:
 
 ```php
-$contact = $mp->table('Contacts')->delete(24599);
+$contact = $mp->table('Contacts')->userID(9534)->delete(24599);
 ```
 
 ### Deleting Multiple Records
