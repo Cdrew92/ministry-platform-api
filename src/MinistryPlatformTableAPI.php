@@ -18,6 +18,14 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
      * @var string
      */
     protected $select = '*';
+
+    /**
+     * To create or update a record as a specific user. 
+     * 
+     *
+     * @var null
+     */
+    protected $userID = null;
     
     /**
      * WHERE clause in "MP-SQL" format
@@ -113,6 +121,20 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     public function select($select)
     {
         $this->select = $select;
+        
+        return $this;
+    }
+
+    /**
+     * Set the userId query for POST or PUT Request
+     *
+     * @param $userId
+     *
+     * @return $this
+     */
+    public function userID($userID)
+    {
+        $this->userID = $userID;
         
         return $this;
     }
@@ -305,11 +327,14 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     {
         $parameters = [
                 'headers' => $this->buildHttpHeader(),
-                'query' => ['$select' => $this->select],
+                'query' => [
+                    '$select' => $this->select,
+                    '$userId' => $this->userID,
+                ],
                 'body' => $this->postFields,
                 'curl' => $this->setPostCurlopts(),
         ];
-        
+
         $results = $this->sendData('PUT', $parameters);
         $this->reset();
         return $results;
@@ -320,7 +345,10 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     {
         $parameters = [
                 'headers' => $this->buildHttpHeader(),
-                'query' => ['$select' => $this->select],
+                'query' => [
+                    '$select' => $this->select,
+                    '$userId' => $this->userID,
+                ],
                 'body' => $this->postFields,
                 'curl' => $this->setPostCurlopts(),
         ];
@@ -350,6 +378,9 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
         try {
             $response = $client->request('DELETE', $endpoint, [
                     'headers' => $this->headers,
+                    'query' => [
+                        '$userId' => $this->userID,
+                    ],
                     'curl' => $this->setGetCurlopts(),
             ]);
         } catch (\GuzzleException $e) {
