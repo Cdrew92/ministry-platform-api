@@ -86,6 +86,11 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     protected $userID = null;
 
     /**
+     * AllowCreate - Allow record creation when using PUT
+     */
+    protected $allowCreate = null;
+
+    /**
      * Sets global partitioning filter value
      */
     protected $globalFilterID = null;
@@ -243,6 +248,17 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     public function userId($userID)
     {
         $this->userID = $userID;
+
+        return $this;
+    }
+
+    /**
+     * Set the Allow Create value
+     * @param int $allowCreate
+     */
+    public function allowCreate($allowCreate)
+    {
+        $this->allowCreate = $allowCreate;
 
         return $this;
     }
@@ -428,7 +444,7 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     {
         $parameters = [
             'headers' => $this->buildHttpHeader(),
-            'query' => ['$select' => $this->select],
+            'query' => ['$select' => $this->select, '$allowCreate' => $this->allowCreate],
             'body' => $this->postFields,
             'curl' => $this->setPostCurlopts(),
         ];
